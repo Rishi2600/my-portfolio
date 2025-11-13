@@ -1,11 +1,11 @@
 function Header() {
   return (
     <>
-        <header>
+        <div>
             <a href="#about">About</a>
             <a href="#projects">Projects</a>
             <a href="#contact">Contact</a>
-        </header>
+        </div>
     </>
   )
 }
