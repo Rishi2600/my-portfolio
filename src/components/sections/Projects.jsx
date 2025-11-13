@@ -20,10 +20,10 @@ function Projects() {
             <section className="projects">
                 <h2>Projects</h2>
                 {projects.map(project => (
-                    <div key={project.name} className="project">
+                    <div key={project.name}>
                         <h3>{project.name}</h3>
                         <p>{project.tech}</p>
-                        <div className="links">
+                        <div>
                             <a href={project.live}>Live</a>
                             <a href={project.code}>Code</a>
                         </div>
