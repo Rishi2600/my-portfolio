@@ -17,7 +17,7 @@ function Projects() {
 
     return (
         <>
-            <section className="projects">
+            <section>
                 <h2>Projects</h2>
                 {projects.map(project => (
                     <div key={project.name}>
