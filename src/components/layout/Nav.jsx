@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ThemeToggle from "../ui/ThemeToggle";
 
 const LINKS = [
   ["About", "#about"],
@@ -7,7 +8,7 @@ const LINKS = [
   ["Contact", "#contact"],
 ];
 
-export default function Nav() {
+export default function Nav({ theme, onToggleTheme }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -21,7 +22,11 @@ export default function Nav() {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "nav-scrolled" : ""}`}
     >
       <div className="max-w-6xl mx-auto px-6 md:px-10 flex items-center justify-between h-20">
-        <a href="#top" className="font-display text-xl tracking-tight" style={{ color: "var(--ink)" }}>
+        <a
+          href="#top"
+          className="font-display text-xl tracking-tight"
+          style={{ color: "var(--ink)" }}
+        >
           Your Name<span style={{ color: "var(--amber-deep)" }}>.</span>
         </a>
         <nav className="hidden md:flex items-center gap-9 font-mono text-xs uppercase tracking-widest">
@@ -31,9 +36,12 @@ export default function Nav() {
             </a>
           ))}
         </nav>
-        <a href="#contact" className="btn-ghost hidden md:inline-flex">
-          Say hello
-        </a>
+        <div className="flex items-center gap-3">
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+          <a href="#contact" className="btn-ghost hidden md:inline-flex">
+            Say hello
+          </a>
+        </div>
       </div>
     </header>
   );

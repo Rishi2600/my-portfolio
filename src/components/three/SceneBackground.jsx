@@ -16,16 +16,22 @@ import * as THREE from "three";
  * drifts and dollies slightly — so the same scene runs continuously
  * behind every section instead of stopping after the hero.
  */
-export default function SceneBackground() {
+export default function SceneBackground({ isDark = false }) {
   const mountRef = useRef(null);
   const scrollRef = useRef(0);
+  const isDarkRef = useRef(isDark);
+
+  useEffect(() => {
+    isDarkRef.current = isDark;
+  }, [isDark]);
 
   // Track scroll progress in a ref (not state) so we don't trigger
   // React re-renders on every scroll tick — the animate loop reads it.
   useEffect(() => {
     const onScroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
-      scrollRef.current = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      scrollRef.current =
+        max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -36,7 +42,9 @@ export default function SceneBackground() {
     const mount = mountRef.current;
     if (!mount) return;
 
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -51,14 +59,46 @@ export default function SceneBackground() {
     mount.appendChild(renderer.domElement);
 
     // ---- lighting: this is what makes the crystal read as real 3D ----
-    const ambient = new THREE.AmbientLight(0xfff1d8, 0.55);
+    // Two targets — light (sunlit room) and dark (the same crystal now
+    // acting as the room's only light source, like a lit lantern) — with
+    // current values eased toward whichever is active each frame, so
+    // toggling theme fades the scene rather than snapping it.
+    const LIGHT = {
+      ambient: 0.55,
+      sun: 1.1,
+      glow: 2.2,
+      edges: new THREE.Color(0x6b4326),
+      edgesOpacity: 0.55,
+      coreOpacity: 0.42,
+      emissive: 0.6,
+    };
+    const DARK = {
+      ambient: 0.16,
+      sun: 0.25,
+      glow: 3.1,
+      edges: new THREE.Color(0xf6dfae),
+      edgesOpacity: 0.5,
+      coreOpacity: 0.5,
+      emissive: 1.15,
+    };
+    const current = {
+      ambient: LIGHT.ambient,
+      sun: LIGHT.sun,
+      glow: LIGHT.glow,
+      edges: LIGHT.edges.clone(),
+      edgesOpacity: LIGHT.edgesOpacity,
+      coreOpacity: LIGHT.coreOpacity,
+      emissive: LIGHT.emissive,
+    };
+
+    const ambient = new THREE.AmbientLight(0xfff1d8, LIGHT.ambient);
     scene.add(ambient);
 
-    const sun = new THREE.DirectionalLight(0xffe3ad, 1.1);
+    const sun = new THREE.DirectionalLight(0xffe3ad, LIGHT.sun);
     sun.position.set(6, 8, 6);
     scene.add(sun);
 
-    const glow = new THREE.PointLight(0xe8a63d, 2.2, 20, 2);
+    const glow = new THREE.PointLight(0xe8a63d, LIGHT.glow, 20, 2);
     glow.position.set(-3, 1, 4);
     scene.add(glow);
 
@@ -72,15 +112,15 @@ export default function SceneBackground() {
       roughness: 0.25,
       flatShading: true,
       transparent: true,
-      opacity: 0.42,
+      opacity: current.coreOpacity,
     });
     crystalGroup.add(new THREE.Mesh(coreGeo, coreMat));
 
     const edgesGeo = new THREE.EdgesGeometry(coreGeo);
     const edgesMat = new THREE.LineBasicMaterial({
-      color: 0x6b4326,
+      color: current.edges,
       transparent: true,
-      opacity: 0.55,
+      opacity: current.edgesOpacity,
     });
     crystalGroup.add(new THREE.LineSegments(edgesGeo, edgesMat));
 
@@ -88,7 +128,7 @@ export default function SceneBackground() {
     const innerMat = new THREE.MeshStandardMaterial({
       color: 0xffffff,
       emissive: 0xe8a63d,
-      emissiveIntensity: 0.6,
+      emissiveIntensity: current.emissive,
       metalness: 0,
       roughness: 0.4,
       flatShading: true,
@@ -98,7 +138,11 @@ export default function SceneBackground() {
     crystalGroup.add(new THREE.Mesh(innerGeo, innerMat));
 
     const ringGeo = new THREE.TorusGeometry(3.1, 0.02, 8, 96);
-    const ringMat = new THREE.MeshBasicMaterial({ color: 0xc9832a, transparent: true, opacity: 0.4 });
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0xc9832a,
+      transparent: true,
+      opacity: 0.4,
+    });
     const ring = new THREE.Mesh(ringGeo, ringMat);
     ring.rotation.x = Math.PI / 2.4;
     crystalGroup.add(ring);
@@ -135,7 +179,10 @@ export default function SceneBackground() {
     // ---- sparkles orbiting the crystal ----
     const SPARK_COUNT = 46;
     const sparkGeo = new THREE.BufferGeometry();
-    sparkGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(SPARK_COUNT * 3), 3));
+    sparkGeo.setAttribute(
+      "position",
+      new THREE.BufferAttribute(new Float32Array(SPARK_COUNT * 3), 3),
+    );
     const sparkOrbit = Array.from({ length: SPARK_COUNT }, () => ({
       radius: 2.6 + Math.random() * 1.6,
       speed: 0.3 + Math.random() * 0.6,
@@ -175,7 +222,10 @@ export default function SceneBackground() {
       moteSeeds[i] = Math.random() * Math.PI * 2;
     }
     const moteGeo = new THREE.BufferGeometry();
-    moteGeo.setAttribute("position", new THREE.BufferAttribute(motePositions, 3));
+    moteGeo.setAttribute(
+      "position",
+      new THREE.BufferAttribute(motePositions, 3),
+    );
     const moteMat = new THREE.PointsMaterial({
       size: 0.15,
       map: moteTexture,
@@ -207,12 +257,35 @@ export default function SceneBackground() {
     const animate = () => {
       t += 0.006 * speed;
       const p = scrollRef.current;
+      const target = isDarkRef.current ? DARK : LIGHT;
+      const ease = 0.04;
+
+      // ease current lighting values toward the active theme's targets —
+      // this is what makes toggling theme feel like a fade, not a snap
+      current.ambient += (target.ambient - current.ambient) * ease;
+      current.sun += (target.sun - current.sun) * ease;
+      current.glow += (target.glow - current.glow) * ease;
+      current.edgesOpacity +=
+        (target.edgesOpacity - current.edgesOpacity) * ease;
+      current.coreOpacity += (target.coreOpacity - current.coreOpacity) * ease;
+      current.emissive += (target.emissive - current.emissive) * ease;
+      current.edges.lerp(target.edges, ease);
+
+      ambient.intensity = current.ambient;
+      sun.intensity = current.sun;
+      glow.intensity = current.glow;
+      edgesMat.opacity = current.edgesOpacity;
+      edgesMat.color.copy(current.edges);
+      coreMat.opacity = current.coreOpacity;
+      innerMat.emissiveIntensity = current.emissive;
 
       // motes drift + shift color across the page's "time of day"
       const moteAttr = moteGeo.attributes.position;
       for (let i = 0; i < MOTE_COUNT; i++) {
-        moteAttr.array[i * 3 + 1] += Math.sin(t * 3 + moteSeeds[i]) * 0.001 * speed;
-        moteAttr.array[i * 3] += Math.cos(t * 2 + moteSeeds[i]) * 0.0005 * speed;
+        moteAttr.array[i * 3 + 1] +=
+          Math.sin(t * 3 + moteSeeds[i]) * 0.001 * speed;
+        moteAttr.array[i * 3] +=
+          Math.cos(t * 2 + moteSeeds[i]) * 0.0005 * speed;
       }
       moteAttr.needsUpdate = true;
       motes.rotation.y = t * 0.1 + p * 1.2;
@@ -226,8 +299,10 @@ export default function SceneBackground() {
       // crystal: continuous spin, plus it visibly turns faster & rises with
       // scroll, and tilts toward the cursor for a touch of interactivity
       crystalGroup.rotation.y = t * 0.35 + p * Math.PI * 1.6 + mouseX * 0.65;
-      crystalGroup.rotation.x = Math.sin(t * 0.4) * 0.15 + p * 0.6 - mouseY * 0.5;
-      crystalGroup.rotation.z += (mouseX * 0.22 - crystalGroup.rotation.z) * 0.05;
+      crystalGroup.rotation.x =
+        Math.sin(t * 0.4) * 0.15 + p * 0.6 - mouseY * 0.5;
+      crystalGroup.rotation.z +=
+        (mouseX * 0.22 - crystalGroup.rotation.z) * 0.05;
       crystalGroup.position.y = 0.4 + Math.sin(t * 0.6) * 0.3 - p * 2.4;
       crystalGroup.position.x = 2.4 - p * 1.6;
       const s = (1 + p * 0.35) * (1 + Math.sin(t * 1.1) * 0.02);
@@ -242,7 +317,11 @@ export default function SceneBackground() {
       glow.color.copy(moteMat.color);
 
       // glow halo follows the crystal, pulses gently, and warms with scroll
-      glowSprite.position.set(crystalGroup.position.x, crystalGroup.position.y, crystalGroup.position.z - 0.5);
+      glowSprite.position.set(
+        crystalGroup.position.x,
+        crystalGroup.position.y,
+        crystalGroup.position.z - 0.5,
+      );
       const pulse = 8.5 + Math.sin(t * 1.6) * 0.6 + p * 2;
       glowSprite.scale.set(pulse, pulse, 1);
       glowSpriteMat.color.copy(moteMat.color);
@@ -252,16 +331,21 @@ export default function SceneBackground() {
       for (let i = 0; i < SPARK_COUNT; i++) {
         const o = sparkOrbit[i];
         const a = t * o.speed + o.offset;
-        sparkAttr.array[i * 3] = crystalGroup.position.x + Math.cos(a) * o.radius;
+        sparkAttr.array[i * 3] =
+          crystalGroup.position.x + Math.cos(a) * o.radius;
         sparkAttr.array[i * 3 + 1] =
-          crystalGroup.position.y + Math.sin(a) * o.radius * 0.4 + Math.sin(a * 2) * o.tilt;
-        sparkAttr.array[i * 3 + 2] = crystalGroup.position.z + Math.sin(a) * o.radius;
+          crystalGroup.position.y +
+          Math.sin(a) * o.radius * 0.4 +
+          Math.sin(a * 2) * o.tilt;
+        sparkAttr.array[i * 3 + 2] =
+          crystalGroup.position.z + Math.sin(a) * o.radius;
       }
       sparkAttr.needsUpdate = true;
 
       // gentle camera drift + scroll dolly, plus mouse parallax
       camera.position.x += (mouseX * 1.8 - p * 0.8 - camera.position.x) * 0.035;
-      camera.position.y += (-mouseY * 1.2 + p * 0.4 - camera.position.y) * 0.035;
+      camera.position.y +=
+        (-mouseY * 1.2 + p * 0.4 - camera.position.y) * 0.035;
       camera.position.z = 9 - p * 1.5;
       camera.lookAt(0.6, 0, 0);
 
@@ -284,10 +368,25 @@ export default function SceneBackground() {
       window.removeEventListener("mousemove", handleMouse);
       window.removeEventListener("resize", handleResize);
 
-      [coreGeo, edgesGeo, innerGeo, ringGeo, ring2Geo, sparkGeo, moteGeo].forEach((g) => g.dispose());
-      [coreMat, edgesMat, innerMat, ringMat, ring2Mat, sparkMat, moteMat, glowSpriteMat].forEach((m) =>
-        m.dispose()
-      );
+      [
+        coreGeo,
+        edgesGeo,
+        innerGeo,
+        ringGeo,
+        ring2Geo,
+        sparkGeo,
+        moteGeo,
+      ].forEach((g) => g.dispose());
+      [
+        coreMat,
+        edgesMat,
+        innerMat,
+        ringMat,
+        ring2Mat,
+        sparkMat,
+        moteMat,
+        glowSpriteMat,
+      ].forEach((m) => m.dispose());
       [glowTexture, sparkTexture, moteTexture].forEach((tex) => tex.dispose());
 
       renderer.dispose();
@@ -311,7 +410,14 @@ function makeRadialTexture(size, stops) {
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext("2d");
-  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  const grad = ctx.createRadialGradient(
+    size / 2,
+    size / 2,
+    0,
+    size / 2,
+    size / 2,
+    size / 2,
+  );
   stops.forEach(([offset, color]) => grad.addColorStop(offset, color));
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, size, size);

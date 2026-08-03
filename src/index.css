@@ -3,10 +3,15 @@
 @tailwind utilities;
 
 /* ----------------------------------------------------------------------
-   Design tokens — warm, sunlit palette. See README for the rationale.
+   Design tokens
+   Light = late-morning sun through a window. Dark = the same room after
+   sunset, lit by warm lamp/ember light — same palette family, not an
+   inverted afterthought. Everything below reads off these variables, so
+   the two themes stay in sync automatically.
 ---------------------------------------------------------------------- */
 :root {
   --bg: #fbf6ec;
+  --bg-soft: #fdf9ef;
   --surface: #fffdf8;
   --ink: #2a2117;
   --muted: #6e6153;
@@ -15,6 +20,27 @@
   --sage: #74886a;
   --clay: #9c5b34;
   --line: rgba(42, 33, 23, 0.14);
+  --shadow: rgba(42, 33, 23, 0.28);
+  --on-amber: #2a2117;
+  --cursor-glow-opacity: 0.12;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #14110d;
+  --bg-soft: #1a160f;
+  --surface: #1e1912;
+  --ink: #f4ead9;
+  --muted: #b7a88c;
+  --amber: #f0b457;
+  --amber-deep: #f8c876;
+  --sage: #93ac86;
+  --clay: #dd935f;
+  --line: rgba(244, 234, 217, 0.14);
+  --shadow: rgba(0, 0, 0, 0.55);
+  --on-amber: #1a1109;
+  --cursor-glow-opacity: 0.2;
+  color-scheme: dark;
 }
 
 html {
@@ -26,6 +52,7 @@ body {
   color: var(--ink);
   font-family: "Inter", sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.5s ease, color 0.4s ease;
 }
 
 .font-display {
@@ -35,6 +62,12 @@ body {
   font-family: "JetBrains Mono", monospace;
 }
 
+/* Smooth theme crossfade on every surface that carries a var-driven color */
+h1, h2, h3, p, a, span, div,
+.rail-track, .rail-dot, .rail-tick-mark {
+  transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+}
+
 /* ----------------------------------------------------------------------
    Background scene layer
 ---------------------------------------------------------------------- */
@@ -42,22 +75,23 @@ body {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: radial-gradient(65% 55% at 80% 12%, rgba(232, 166, 61, 0.28), rgba(232, 166, 61, 0) 70%),
-    radial-gradient(45% 40% at 10% 90%, rgba(116, 136, 106, 0.14), rgba(116, 136, 106, 0) 70%),
-    linear-gradient(180deg, #fdf9ef 0%, var(--bg) 45%, var(--bg) 100%);
+  transition: background-color 0.5s ease;
+  background: radial-gradient(65% 55% at 80% 12%, color-mix(in srgb, var(--amber) 28%, transparent), transparent 70%),
+    radial-gradient(45% 40% at 10% 90%, color-mix(in srgb, var(--sage) 14%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 45%, var(--bg) 100%);
 }
 .scene-vignette {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(120% 90% at 50% 30%, rgba(251, 246, 236, 0) 55%, rgba(251, 246, 236, 0.9) 100%);
+  background: radial-gradient(120% 90% at 50% 30%, transparent 55%, color-mix(in srgb, var(--bg) 90%, transparent) 100%);
 }
 
 /* ----------------------------------------------------------------------
    Nav
 ---------------------------------------------------------------------- */
 .nav-scrolled {
-  background: rgba(251, 246, 236, 0.7);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
 }
@@ -67,6 +101,42 @@ body {
 }
 .nav-link:hover {
   color: var(--ink);
+}
+
+/* ----------------------------------------------------------------------
+   Theme toggle
+---------------------------------------------------------------------- */
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface) 45%, transparent);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+.theme-toggle:hover {
+  border-color: var(--amber-deep);
+  background: color-mix(in srgb, var(--amber) 16%, transparent);
+  transform: translateY(-2px);
+}
+.theme-toggle-icon {
+  display: flex;
+  animation: theme-icon-in 0.4s ease;
+}
+@keyframes theme-icon-in {
+  from {
+    transform: rotate(-90deg) scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(0) scale(1);
+    opacity: 1;
+  }
 }
 
 /* ----------------------------------------------------------------------
@@ -83,10 +153,11 @@ body {
   font-size: 14px;
   padding: 14px 24px;
   border-radius: 999px;
-  transition: background 0.3s ease, transform 0.3s ease;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease-out;
 }
 .btn-primary:hover {
   background: var(--amber-deep);
+  color: var(--on-amber);
   transform: translateY(-2px);
 }
 
@@ -101,12 +172,12 @@ body {
   padding: 14px 24px;
   border-radius: 999px;
   backdrop-filter: blur(10px);
-  background: rgba(255, 253, 248, 0.35);
-  transition: border-color 0.3s ease, background 0.3s ease;
+  background: color-mix(in srgb, var(--surface) 35%, transparent);
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.2s ease-out;
 }
 .btn-outline:hover {
   border-color: var(--clay);
-  background: rgba(156, 91, 52, 0.1);
+  background: color-mix(in srgb, var(--clay) 12%, transparent);
 }
 
 .btn-ghost {
@@ -120,7 +191,7 @@ body {
   transition: background 0.3s ease;
 }
 .btn-ghost:hover {
-  background: rgba(42, 33, 23, 0.05);
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
 }
 
 /* ----------------------------------------------------------------------
@@ -160,7 +231,12 @@ body {
   position: relative;
   width: 1px;
   height: min(58vh, 460px);
-  background: linear-gradient(180deg, rgba(232, 166, 61, 0.15), var(--clay) 45%, rgba(116, 136, 106, 0.35));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--amber) 15%, transparent),
+    var(--clay) 45%,
+    color-mix(in srgb, var(--sage) 35%, transparent)
+  );
 }
 .rail-dot {
   position: absolute;
@@ -170,9 +246,10 @@ body {
   height: 9px;
   border-radius: 999px;
   background: var(--amber-deep);
-  box-shadow: 0 0 0 4px rgba(232, 166, 61, 0.25), 0 0 16px rgba(232, 166, 61, 0.6);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--amber) 25%, transparent),
+    0 0 16px color-mix(in srgb, var(--amber) 60%, transparent);
   transform: translate(-50%, -50%);
-  transition: top 0.1s linear;
+  transition: top 0.1s linear, background-color 0.4s ease, box-shadow 0.4s ease;
 }
 .rail-ticks {
   position: absolute;
@@ -218,19 +295,6 @@ body {
   transform: scale(1.6);
 }
 
-/* ----------------------------------------------------------------------
-   About
----------------------------------------------------------------------- */
-.about-portrait {
-  aspect-ratio: 4 / 5;
-  border-radius: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(120% 100% at 20% 0%, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0) 55%),
-    linear-gradient(160deg, var(--amber) 0%, var(--clay) 55%, #6b4326 100%);
-  box-shadow: 0 30px 60px -25px rgba(42, 33, 23, 0.35);
-}
 .fact-row {
   border-top: 1px solid var(--line);
 }
@@ -242,7 +306,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 253, 248, 0.55);
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
   backdrop-filter: blur(8px);
   border: 1px solid var(--line);
   padding: 10px 18px;
@@ -253,7 +317,7 @@ body {
 }
 .skill-chip:hover {
   border-color: var(--amber-deep);
-  background: rgba(232, 166, 61, 0.16);
+  background: color-mix(in srgb, var(--amber) 16%, transparent);
   transform: translateY(-3px);
 }
 
@@ -264,15 +328,15 @@ body {
   border: 1px dashed var(--line);
   border-radius: 20px;
   padding: 28px;
-  background: rgba(255, 253, 248, 0.5);
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
   backdrop-filter: blur(10px);
-  transition: border-color 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+  transition: border-color 0.35s ease, background-color 0.4s ease, transform 0.35s ease, box-shadow 0.35s ease;
 }
 .project-card:hover {
   border-color: var(--amber-deep);
   border-style: solid;
   transform: translateY(-4px);
-  box-shadow: 0 24px 48px -28px rgba(42, 33, 23, 0.28);
+  box-shadow: 0 24px 48px -28px var(--shadow);
 }
 .project-plus {
   width: 34px;
@@ -287,7 +351,7 @@ body {
 }
 .project-card:hover .project-plus {
   background: var(--amber);
-  color: var(--ink);
+  color: var(--on-amber);
   border-color: var(--amber);
 }
 
@@ -306,7 +370,7 @@ body {
   border-radius: inherit;
   background: radial-gradient(
     220px circle at var(--glow-x, 50%) var(--glow-y, 50%),
-    rgba(232, 166, 61, 0.18),
+    color-mix(in srgb, var(--amber) 22%, transparent),
     transparent 60%
   );
   opacity: 0;
@@ -334,9 +398,10 @@ body {
   margin-left: -230px;
   margin-top: -230px;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(232, 166, 61, 0.12), rgba(232, 166, 61, 0) 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--amber) calc(var(--cursor-glow-opacity) * 100%), transparent), transparent 70%);
   pointer-events: none;
   z-index: 1;
+  transition: background-color 0.4s ease;
 }
 @media (max-width: 1024px) {
   .cursor-glow {
@@ -356,8 +421,8 @@ body {
   align-items: center;
   justify-content: center;
   color: var(--ink);
-  background: rgba(255, 253, 248, 0.4);
-  transition: background 0.3s ease, transform 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  background: color-mix(in srgb, var(--surface) 40%, transparent);
+  transition: background 0.3s ease, transform 0.2s ease-out, border-color 0.3s ease, color 0.3s ease;
 }
 .social-link:hover {
   background: var(--ink);
@@ -415,5 +480,8 @@ button:focus-visible {
   }
   .animate-float {
     animation: none;
+  }
+  h1, h2, h3, p, a, span, div, body, .scene-bg {
+    transition: none;
   }
 }

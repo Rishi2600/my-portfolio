@@ -8,16 +8,19 @@ import About from "./components/sections/About";
 import Skills from "./components/sections/Skills";
 import Projects from "./components/sections/Projects";
 import Contact from "./components/sections/Contact";
+import { useTheme } from "./hooks/useTheme";
 
 export default function App() {
+  const { theme, toggleTheme, isDark } = useTheme();
+
   return (
     <>
-      <SceneBackground />
+      <SceneBackground isDark={isDark} />
       <CursorGlow />
       <ScrollRail />
 
       <div className="relative z-10">
-        <Nav />
+        <Nav theme={theme} onToggleTheme={toggleTheme} />
         <Hero />
         <About />
         <Skills />
