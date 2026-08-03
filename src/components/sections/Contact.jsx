@@ -11,10 +11,7 @@ export default function Contact() {
   return (
     <section id="contact" className="section-flow">
       <div className="max-w-6xl mx-auto px-6 md:px-10 py-28 md:py-36 text-center">
-        <Reveal
-          className="font-mono text-xs uppercase tracking-[0.25em] mb-6"
-          style={{ color: "var(--clay)" }}
-        >
+        <Reveal className="font-mono text-xs uppercase tracking-[0.25em] mb-6" style={{ color: "var(--clay)" }}>
           Contact
         </Reveal>
         <Reveal delay={1}>
@@ -34,10 +31,7 @@ export default function Contact() {
             hello@yourname.com
           </a>
         </Reveal>
-        <Reveal
-          delay={3}
-          className="mt-10 flex items-center justify-center gap-6"
-        >
+        <Reveal delay={3} className="mt-10 flex items-center justify-center gap-6">
           <a
             ref={githubLink.ref}
             onMouseMove={githubLink.onMouseMove}

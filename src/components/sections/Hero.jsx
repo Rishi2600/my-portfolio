@@ -7,15 +7,9 @@ export default function Hero() {
   const contactBtn = useMagnetic();
 
   return (
-    <section
-      id="top"
-      className="relative min-h-[100svh] flex items-end overflow-hidden"
-    >
+    <section id="top" className="relative min-h-[100svh] flex items-end overflow-hidden">
       <div className="relative max-w-6xl mx-auto px-6 md:px-10 pb-24 pt-40 w-full">
-        <Reveal
-          className="font-mono text-xs uppercase tracking-[0.25em] mb-6"
-          style={{ color: "var(--clay)" }}
-        >
+        <Reveal className="font-mono text-xs uppercase tracking-[0.25em] mb-6" style={{ color: "var(--clay)" }}>
           Portfolio — {new Date().getFullYear()}
         </Reveal>
         <Reveal delay={1}>
@@ -28,13 +22,9 @@ export default function Hero() {
             <br />I build interfaces that feel like sunlight through a window.
           </h1>
         </Reveal>
-        <Reveal
-          delay={2}
-          className="mt-8 max-w-lg text-lg"
-          style={{ color: "var(--muted)" }}
-        >
-          Frontend developer &amp; designer, working somewhere between clean
-          code and warm, considered detail. Based in Delhi.
+        <Reveal delay={2} className="mt-8 max-w-lg text-lg" style={{ color: "var(--muted)" }}>
+          Frontend developer &amp; designer, working somewhere between clean code
+          and warm, considered detail. Based in Delhi.
         </Reveal>
         <Reveal delay={3} className="mt-10 flex flex-wrap gap-4">
           <a
