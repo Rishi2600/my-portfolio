@@ -1,10 +1,10 @@
 import { Mail } from "lucide-react";
 import { GithubIcon, XIcon } from "../ui/BrandIcons";
 import Reveal from "../ui/Reveal";
+import ContactForm from "./ContactForm";
 import { useMagnetic } from "../../hooks/useMagnetic";
 
 export default function Contact() {
-  const emailBtn = useMagnetic();
   const githubLink = useMagnetic(0.5);
   const xLink = useMagnetic(0.5);
 
@@ -19,19 +19,16 @@ export default function Contact() {
             Let's build something worth the light.
           </h2>
         </Reveal>
-        <Reveal delay={2} className="mt-8">
-          <a
-            ref={emailBtn.ref}
-            onMouseMove={emailBtn.onMouseMove}
-            onMouseLeave={emailBtn.onMouseLeave}
-            href="mailto:rishiraj6177@gmail.com"
-            className="btn-primary magnetic inline-flex"
-          >
-            <Mail size={16} strokeWidth={2.25} />
-            rishiraj6177@gmail.com
+        <Reveal delay={2} className="mt-12">
+          <ContactForm />
+        </Reveal>
+        <Reveal delay={3} className="mt-12">
+          <a href="mailto:rishiraj6177@gmail.com" className="form-direct">
+            <Mail size={15} strokeWidth={2} />
+            or just email me — rishiraj6177@gmail.com
           </a>
         </Reveal>
-        <Reveal delay={3} className="mt-10 flex items-center justify-center gap-6">
+        <Reveal delay={3} className="mt-8 flex items-center justify-center gap-6">
           <a
             ref={githubLink.ref}
             onMouseMove={githubLink.onMouseMove}

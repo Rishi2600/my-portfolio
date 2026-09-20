@@ -460,6 +460,171 @@ h1, h2, h3, p, a, span, div,
 }
 
 /* ----------------------------------------------------------------------
+   Contact form
+   The section is centred, the form is not — labels and errors read far
+   better flush left, so only the block itself is centred.
+---------------------------------------------------------------------- */
+.contact-form {
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.form-row {
+  display: grid;
+  gap: 18px;
+}
+@media (min-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.form-row .form-field {
+  margin-bottom: 0;
+}
+
+.form-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--clay);
+}
+
+.form-control {
+  width: 100%;
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 13px 16px;
+  transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+textarea.form-control {
+  resize: vertical;
+  min-height: 132px;
+  line-height: 1.6;
+}
+.form-control::placeholder {
+  color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--amber-deep);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--amber) 22%, transparent);
+}
+.form-control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.form-control.has-error {
+  border-color: var(--clay);
+}
+
+.form-error {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--clay);
+}
+
+/* Present to bots reading the DOM, gone for everyone else. `display: none`
+   is skipped by some crawlers, so this is moved out of view instead. */
+.form-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.form-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 26px;
+}
+.form-foot .btn-primary:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+.form-failure {
+  font-size: 13px;
+  color: var(--clay);
+  flex: 1 1 220px;
+}
+
+.form-spin {
+  animation: form-spin 0.9s linear infinite;
+}
+@keyframes form-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.contact-form-sent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 44px 28px;
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
+  backdrop-filter: blur(10px);
+}
+.form-sent-mark {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  background: var(--amber);
+  color: var(--on-amber);
+}
+.form-reset {
+  margin-top: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  transition: color 0.25s ease;
+}
+.form-reset:hover {
+  color: var(--amber-deep);
+}
+
+.form-direct {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--muted);
+  transition: color 0.25s ease;
+}
+.form-direct:hover {
+  color: var(--amber-deep);
+}
+
+/* ----------------------------------------------------------------------
    Contact
 ---------------------------------------------------------------------- */
 .social-link {
@@ -530,6 +695,11 @@ button:focus-visible {
   }
   .animate-float {
     animation: none;
+  }
+  /* Slowed rather than stopped — it's the only thing telling you the
+     submission is still in flight. */
+  .form-spin {
+    animation-duration: 2.4s;
   }
   h1, h2, h3, p, a, span, div, body, .scene-bg {
     transition: none;

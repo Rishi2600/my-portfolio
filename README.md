@@ -36,6 +36,7 @@ src/
     sections/Skills.jsx
     sections/Projects.jsx      Case-study cards
     sections/Contact.jsx
+    sections/ContactForm.jsx   Client-side form, relayed to email via Web3Forms
     ui/Reveal.jsx               Fade/slide-in wrapper used across sections
   hooks/
     useReveal.js                Scroll-into-view detection (IntersectionObserver)
@@ -44,6 +45,31 @@ src/
     projects.js                 Case studies — title, blurb, stack, live + code links
     railSections.js              Section ids/labels used by the scroll rail
 ```
+
+## Contact form
+
+The form in `sections/ContactForm.jsx` has no backend. A browser can't send
+mail — SMTP needs a credential, and a credential in client JS is a credential
+every visitor has. So the form POSTs JSON to [Web3Forms](https://web3forms.com),
+which keeps the mail credential on its side and relays the submission to the
+inbox that created the access key.
+
+To set it up:
+
+1. Get a free access key at [web3forms.com](https://web3forms.com) — enter the
+   destination email and the key is mailed to you.
+2. `cp .env.example .env.local` and set `VITE_WEB3FORMS_KEY`.
+3. Set the same variable in your host's environment (Vercel → Settings →
+   Environment Variables) so production builds pick it up.
+
+Without the key the form still renders and validates, but tells the visitor to
+use the direct email link instead.
+
+The key is public by design: `VITE_`-prefixed variables are inlined into the
+bundle at build time. That's safe here because the key only ever delivers to
+the address that created it. Spam is the real risk, not exfiltration, which is
+why the form carries an off-screen honeypot field and length caps. If it ever
+gets abused, Web3Forms has hCaptcha support to add on top.
 
 ## Editing content
 
