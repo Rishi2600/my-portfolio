@@ -1,11 +1,19 @@
 import { useState } from "react";
 import { ArrowUpRight, Check, Loader2 } from "lucide-react";
 
-// Posts to our own serverless function (api/contact.js), never to the mail
-// relay directly — that's what keeps the Web3Forms key off the wire and out
-// of the Network tab. The request leaving the browser carries nothing but
-// what the visitor typed.
-const ENDPOINT = "/api/contact";
+// A browser can't send mail — SMTP needs a credential — so this posts to
+// Web3Forms, which holds the mail credential and relays to the inbox that
+// created the access key.
+//
+// The key travels in the request body and is visible in the Network tab.
+// That is how Web3Forms is designed to work: their free tier rejects
+// server-to-server calls outright (403, "use our API in client side"), so
+// proxying it through a serverless function to hide the key is not an
+// option here. It's a public identifier, not a secret — the only thing it
+// can do in the wrong hands is deliver mail to that same inbox, which is
+// what the honeypot and the length caps below are guarding against.
+const ENDPOINT = "https://api.web3forms.com/submit";
+const ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_KEY;
 
 const EMPTY = { name: "", email: "", message: "" };
 const LIMITS = { name: 80, email: 120, message: 2000 };
@@ -53,6 +61,12 @@ export default function ContactForm() {
       return;
     }
 
+    if (!ACCESS_KEY) {
+      setStatus("error");
+      setFailure("The form isn't configured yet — email me directly below.");
+      return;
+    }
+
     setStatus("sending");
     setFailure("");
 
@@ -61,20 +75,33 @@ export default function ContactForm() {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
+          access_key: ACCESS_KEY,
+          subject: `Portfolio enquiry from ${values.name.trim()}`,
+          from_name: "Portfolio",
           name: values.name.trim(),
           email: values.email.trim(),
           message: values.message.trim(),
+          botcheck: false,
         }),
       });
 
-      const result = await response.json().catch(() => ({}));
+      // Read once as text, then parse. Going straight to .json() and
+      // swallowing the throw hides what actually came back when it fails.
+      const raw = await response.text();
+      let result = null;
+      try {
+        result = JSON.parse(raw);
+      } catch {
+        console.error("[contact] non-JSON response", response.status, raw.slice(0, 300));
+      }
 
-      if (response.ok && result.success) {
+      if (response.ok && result?.success) {
         setStatus("sent");
         setValues(EMPTY);
       } else {
+        console.error("[contact] Web3Forms rejected the submission", response.status, result);
         setStatus("error");
-        setFailure(result.message || "That didn't go through. Try again, or email me directly.");
+        setFailure("That didn't go through. Try again, or email me directly.");
       }
     } catch {
       setStatus("error");

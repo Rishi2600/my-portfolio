@@ -36,7 +36,7 @@ src/
     sections/Skills.jsx
     sections/Projects.jsx      Case-study cards
     sections/Contact.jsx
-    sections/ContactForm.jsx   Client-side form, relayed to email via Web3Forms
+    sections/ContactForm.jsx   Contact form, relayed to email via Web3Forms
     ui/Reveal.jsx               Fade/slide-in wrapper used across sections
   hooks/
     useReveal.js                Scroll-into-view detection (IntersectionObserver)
@@ -48,40 +48,40 @@ src/
 
 ## Contact form
 
-A browser can't send mail — SMTP needs a credential, and a credential in client
-JS is a credential every visitor has. So the mail goes out in two hops:
+There is no backend. A browser can't send mail — SMTP needs a credential — so
+`sections/ContactForm.jsx` posts to [Web3Forms](https://web3forms.com), which
+holds the mail credential and relays to the inbox that created the key:
 
 ```
-ContactForm.jsx  ──►  api/contact.js  ──►  Web3Forms  ──►  inbox
-   (browser)          (serverless)         (relay)
- name, email,      attaches the key
-   message          from server env
+ContactForm.jsx  ──►  Web3Forms  ──►  inbox
+   (browser)           (relay)
+ access_key + fields
 ```
-
-The browser only ever posts the three fields the visitor typed. The access key
-is attached in `api/contact.js`, which runs on Vercel — so the key appears
-neither in the bundle nor in the Network tab. `WEB3FORMS_KEY` carries no
-`VITE_` prefix precisely because Vite refuses to expose unprefixed variables to
-client code, which makes leaking it by accident impossible rather than merely
-unlikely.
 
 To set it up:
 
 1. Get a free access key at [web3forms.com](https://web3forms.com) — enter the
    destination email and the key is mailed to you.
-2. `cp .env.example .env.local` and set `WEB3FORMS_KEY`.
+2. `cp .env.example .env.local` and set `VITE_WEB3FORMS_KEY`.
 3. Set the same variable in Vercel → Settings → Environment Variables, then
-   redeploy.
+   redeploy. `VITE_` vars are inlined at build time, so a redeploy is required.
 
-Validation runs in both places. The client-side checks are a courtesy to the
-person typing; `api/contact.js` repeats every one of them, because anyone can
-POST to the endpoint directly. Spam is the realistic threat, so the form also
-carries an off-screen honeypot and length caps — a filled honeypot is answered
-with a success response and then dropped, since a visible rejection just tells
-the bot to try again. If it ever gets abused, Web3Forms supports hCaptcha.
+Without the key the form still renders and validates, but tells the visitor to
+use the direct email link instead.
 
-`npm run dev` serves the function too: a small middleware in `vite.config.js`
-runs the same handler locally, so you don't need the Vercel CLI to test it.
+### On the key being public
+
+It is visible in the bundle and in the Network tab, and that is unavoidable on
+the free tier: Web3Forms rejects server-to-server calls with
+`403 — "use our API in client side"`, so putting it behind a serverless proxy
+does not work. Hiding it requires either their Pro plan (server IP allowlist)
+or a relay built for server-side use, such as Resend.
+
+The exposure is bounded — the key only ever delivers to the address that
+created it, so spam is the realistic threat rather than exfiltration. Hence the
+off-screen honeypot and the length caps. A filled honeypot is answered with a
+success response and then dropped, since a visible rejection just tells the bot
+to try again. If it does get abused, Web3Forms supports hCaptcha.
 
 ## Editing content
 
