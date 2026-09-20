@@ -325,7 +325,8 @@ h1, h2, h3, p, a, span, div,
    Projects
 ---------------------------------------------------------------------- */
 .project-card {
-  border: 1px dashed var(--line);
+  height: 100%;
+  border: 1px solid var(--line);
   border-radius: 20px;
   padding: 28px;
   background: color-mix(in srgb, var(--surface) 50%, transparent);
@@ -334,11 +335,60 @@ h1, h2, h3, p, a, span, div,
 }
 .project-card:hover {
   border-color: var(--amber-deep);
-  border-style: solid;
   transform: translateY(-4px);
   box-shadow: 0 24px 48px -28px var(--shadow);
 }
+.project-card .tilt-card-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.project-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 18px;
+}
+.project-stack li {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 10px;
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+.project-card:hover .project-stack li {
+  border-color: color-mix(in srgb, var(--clay) 40%, transparent);
+  color: var(--ink);
+}
+
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: auto;
+  padding-top: 22px;
+}
+.project-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  transition: color 0.25s ease;
+}
+.project-links a:hover {
+  color: var(--amber-deep);
+}
+
 .project-plus {
+  flex: none;
   width: 34px;
   height: 34px;
   border-radius: 999px;

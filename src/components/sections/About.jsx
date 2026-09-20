@@ -1,9 +1,9 @@
 import Reveal from "../ui/Reveal";
 
 const FACTS = [
-  ["Based in", "Delhi, India"],
-  ["Focus", "Web & Interaction"],
-  ["Currently", "Open to work"],
+  ["Focus", "Full-stack web"],
+  ["Stack", "TS · Go · Rust"],
+  ["Building", "IcePlease"],
 ];
 
 export default function About() {
@@ -14,19 +14,22 @@ export default function About() {
       </Reveal>
       <Reveal delay={1}>
         <h2 className="font-display text-4xl md:text-5xl leading-tight mb-6">
-          I like rooms with good light and interfaces with good pacing.
+          I'd rather ship one thing that holds up than five that only demo well.
         </h2>
       </Reveal>
       <Reveal delay={2} className="space-y-4 text-base md:text-lg" style={{ color: "var(--muted)" }}>
         <p>
-          This paragraph is a placeholder — swap it for a short, honest bio. A
-          few sentences on how you got into building things, what kind of
-          problems you enjoy, and the tools you reach for first.
+          I'm a full-stack developer. I work across JavaScript and TypeScript,
+          Go, Rust and Python, but the thing I reach for first is Next.js on
+          top of Postgres — and I'm as happy in the schema as I am in the CSS.
         </p>
         <p>
-          Mention a value or two that shapes your work — clarity, craft,
-          curiosity — and back it up with a specific example once your
-          project section is filled in.
+          Most of what I build is meant to survive contact with real users, so
+          I care about the unglamorous parts: prices settled on the server
+          rather than the browser, orders that keep a snapshot of what was
+          bought, rate limits on the form nobody thinks about. Then, every so
+          often, I write something with no build step at all just to keep the
+          fundamentals sharp.
         </p>
       </Reveal>
       <Reveal delay={3} className="grid grid-cols-3 gap-5 mt-10 pt-8 fact-row">

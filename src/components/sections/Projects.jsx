@@ -1,4 +1,5 @@
-import { Plus } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { GithubIcon } from "../ui/BrandIcons";
 import Reveal from "../ui/Reveal";
 import TiltCard from "../ui/TiltCard";
 import { PROJECTS } from "../../data/projects";
@@ -12,13 +13,13 @@ export default function Projects() {
             Selected work
           </Reveal>
           <Reveal delay={1}>
-            <h2 className="font-display text-4xl md:text-5xl leading-tight">Projects, landing soon.</h2>
+            <h2 className="font-display text-4xl md:text-5xl leading-tight">Four things I've shipped.</h2>
           </Reveal>
         </div>
         <Reveal delay={2} className="max-w-sm text-sm" style={{ color: "var(--muted)" }}>
-          These four slots are placeholders for the design pass. Once the look is
-          approved, real case studies — image, brief, outcome, link — will
-          replace each card below.
+          A product of my own, a CRM running in production, the site for my
+          studio, and one built purely for the fun of it. Every one of them is
+          live, and the source is open.
         </Reveal>
       </div>
 
@@ -26,18 +27,36 @@ export default function Projects() {
         {PROJECTS.map((project, i) => (
           <Reveal key={project.id} delay={(i % 3) + 1}>
             <TiltCard className="project-card">
-              <div className="flex items-center justify-between mb-16">
-                <span className="font-mono text-xs tracking-widest" style={{ color: "var(--clay)" }}>
-                  PLACEHOLDER
+              <div className="flex items-start justify-between gap-4 mb-7">
+                <span className="font-mono text-xs uppercase tracking-widest" style={{ color: "var(--clay)" }}>
+                  {project.kind}
                 </span>
-                <span className="project-plus">
-                  <Plus size={16} strokeWidth={2} />
+                <span className="project-plus" aria-hidden="true">
+                  <ArrowUpRight size={16} strokeWidth={2} />
                 </span>
               </div>
-              <h3 className="font-display text-2xl mb-2">{project.title}</h3>
-              <p className="text-sm" style={{ color: "var(--muted)" }}>
-                Case study coming soon.
+
+              <h3 className="font-display text-2xl mb-3">{project.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
+                {project.description}
               </p>
+
+              <ul className="project-stack">
+                {project.stack.map((tech) => (
+                  <li key={tech}>{tech}</li>
+                ))}
+              </ul>
+
+              <div className="project-links">
+                <a href={project.live} target="_blank" rel="noreferrer noopener">
+                  Live site
+                  <ArrowUpRight size={14} strokeWidth={2} />
+                </a>
+                <a href={project.code} target="_blank" rel="noreferrer noopener">
+                  <GithubIcon size={14} strokeWidth={2} />
+                  Code
+                </a>
+              </div>
             </TiltCard>
           </Reveal>
         ))}

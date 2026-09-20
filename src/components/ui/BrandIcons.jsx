@@ -1,6 +1,6 @@
 // lucide-react removed all brand/logo icons (Github, Linkedin, Twitter, etc.)
 // starting in its 1.x line — they're trademarked logos and were dropped
-// rather than renamed. These two small inline SVGs replace them so the
+// rather than renamed. These small inline SVGs replace them so the
 // Contact section doesn't depend on lucide shipping brand marks at all.
 
 export function GithubIcon({ size = 20, strokeWidth = 1.75, ...rest }) {
@@ -22,22 +22,17 @@ export function GithubIcon({ size = 20, strokeWidth = 1.75, ...rest }) {
   );
 }
 
-export function LinkedinIcon({ size = 20, strokeWidth = 1.75, ...rest }) {
+export function XIcon({ size = 20, strokeWidth, ...rest }) {
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={strokeWidth}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      fill="currentColor"
+      stroke="none"
       {...rest}
     >
-      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-      <rect width="4" height="12" x="2" y="9" />
-      <circle cx="4" cy="4" r="2" />
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644Z" />
     </svg>
   );
 }

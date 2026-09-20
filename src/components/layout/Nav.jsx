@@ -27,7 +27,7 @@ export default function Nav({ theme, onToggleTheme }) {
           className="font-display text-xl tracking-tight"
           style={{ color: "var(--ink)" }}
         >
-          Your Name<span style={{ color: "var(--amber-deep)" }}>.</span>
+          Rishi<span style={{ color: "var(--amber-deep)" }}>.</span>
         </a>
         <nav className="hidden md:flex items-center gap-9 font-mono text-xs uppercase tracking-widest">
           {LINKS.map(([label, href]) => (

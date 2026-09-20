@@ -1,8 +1,8 @@
 # Portfolio
 
-A personal portfolio built with React + Vite, Tailwind, and a Three.js
-background scene. Warm, sunlit palette; scroll-linked animation; placeholder
-project cards ready to swap for real case studies.
+Rishi's personal portfolio — React + Vite, Tailwind, and a Three.js background
+scene. Warm, sunlit palette, scroll-linked animation, and four real case
+studies.
 
 ## Getting started
 
@@ -34,28 +34,31 @@ src/
     sections/Hero.jsx
     sections/About.jsx
     sections/Skills.jsx
-    sections/Projects.jsx      Currently rendering placeholder cards
+    sections/Projects.jsx      Case-study cards
     sections/Contact.jsx
     ui/Reveal.jsx               Fade/slide-in wrapper used across sections
   hooks/
     useReveal.js                Scroll-into-view detection (IntersectionObserver)
   data/
     skills.js                   Skill chips shown in the Skills section
-    projects.js                 Project placeholders — edit this to add real work
+    projects.js                 Case studies — title, blurb, stack, live + code links
     railSections.js              Section ids/labels used by the scroll rail
 ```
 
-## Personalizing
+## Editing content
 
-A few things are placeholder text on purpose:
+Copy lives next to the thing it renders:
 
-- **Name** — currently "Your Name" in `Nav.jsx` and `Hero.jsx`.
-- **Bio** — the paragraphs in `About.jsx`.
-- **Email** — `hello@yourname.com` in `Contact.jsx`.
-- **Social links** — the `href="#"` placeholders in `Contact.jsx`.
-- **Projects** — edit `src/data/projects.js` to add real project data, then
-  update `Projects.jsx` to render whatever fields you add (image, link, tags,
-  outcome, etc).
+- **Projects** — `src/data/projects.js`. Each entry takes `kind`, `title`,
+  `description`, `stack`, `live` and `code`; `Projects.jsx` renders all of them,
+  so adding a fifth project is a data-only change.
+- **Skills** — `src/data/skills.js`, each chip a `{ label, icon }` pair using a
+  [lucide](https://lucide.dev) icon.
+- **Bio and the facts row** — `About.jsx`.
+- **Name and headline** — `Nav.jsx`, `Hero.jsx`, `Footer.jsx`, plus the
+  `<title>` and meta description in `index.html`.
+- **Email and socials** — `Contact.jsx`. GitHub and X marks are hand-rolled
+  SVGs in `ui/BrandIcons.jsx`, since lucide dropped brand logos.
 
 ## Design notes
 
