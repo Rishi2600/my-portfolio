@@ -48,28 +48,40 @@ src/
 
 ## Contact form
 
-The form in `sections/ContactForm.jsx` has no backend. A browser can't send
-mail — SMTP needs a credential, and a credential in client JS is a credential
-every visitor has. So the form POSTs JSON to [Web3Forms](https://web3forms.com),
-which keeps the mail credential on its side and relays the submission to the
-inbox that created the access key.
+A browser can't send mail — SMTP needs a credential, and a credential in client
+JS is a credential every visitor has. So the mail goes out in two hops:
+
+```
+ContactForm.jsx  ──►  api/contact.js  ──►  Web3Forms  ──►  inbox
+   (browser)          (serverless)         (relay)
+ name, email,      attaches the key
+   message          from server env
+```
+
+The browser only ever posts the three fields the visitor typed. The access key
+is attached in `api/contact.js`, which runs on Vercel — so the key appears
+neither in the bundle nor in the Network tab. `WEB3FORMS_KEY` carries no
+`VITE_` prefix precisely because Vite refuses to expose unprefixed variables to
+client code, which makes leaking it by accident impossible rather than merely
+unlikely.
 
 To set it up:
 
 1. Get a free access key at [web3forms.com](https://web3forms.com) — enter the
    destination email and the key is mailed to you.
-2. `cp .env.example .env.local` and set `VITE_WEB3FORMS_KEY`.
-3. Set the same variable in your host's environment (Vercel → Settings →
-   Environment Variables) so production builds pick it up.
+2. `cp .env.example .env.local` and set `WEB3FORMS_KEY`.
+3. Set the same variable in Vercel → Settings → Environment Variables, then
+   redeploy.
 
-Without the key the form still renders and validates, but tells the visitor to
-use the direct email link instead.
+Validation runs in both places. The client-side checks are a courtesy to the
+person typing; `api/contact.js` repeats every one of them, because anyone can
+POST to the endpoint directly. Spam is the realistic threat, so the form also
+carries an off-screen honeypot and length caps — a filled honeypot is answered
+with a success response and then dropped, since a visible rejection just tells
+the bot to try again. If it ever gets abused, Web3Forms supports hCaptcha.
 
-The key is public by design: `VITE_`-prefixed variables are inlined into the
-bundle at build time. That's safe here because the key only ever delivers to
-the address that created it. Spam is the real risk, not exfiltration, which is
-why the form carries an off-screen honeypot field and length caps. If it ever
-gets abused, Web3Forms has hCaptcha support to add on top.
+`npm run dev` serves the function too: a small middleware in `vite.config.js`
+runs the same handler locally, so you don't need the Vercel CLI to test it.
 
 ## Editing content
 

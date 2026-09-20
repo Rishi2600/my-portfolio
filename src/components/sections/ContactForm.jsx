@@ -1,15 +1,11 @@
 import { useState } from "react";
 import { ArrowUpRight, Check, Loader2 } from "lucide-react";
 
-// There is no such thing as sending mail from a browser: SMTP needs a
-// credential, and anything this file knows, so does every visitor. So the
-// form POSTs to Web3Forms, which holds the mail credential on its side and
-// relays the submission to the inbox that created the access key. The key
-// below is a public identifier, not a secret — the worst it can do in the
-// wrong hands is deliver mail to that same inbox, which is why the honeypot
-// and the length caps exist.
-const ENDPOINT = "https://api.web3forms.com/submit";
-const ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_KEY;
+// Posts to our own serverless function (api/contact.js), never to the mail
+// relay directly — that's what keeps the Web3Forms key off the wire and out
+// of the Network tab. The request leaving the browser carries nothing but
+// what the visitor typed.
+const ENDPOINT = "/api/contact";
 
 const EMPTY = { name: "", email: "", message: "" };
 const LIMITS = { name: 80, email: 120, message: 2000 };
@@ -57,12 +53,6 @@ export default function ContactForm() {
       return;
     }
 
-    if (!ACCESS_KEY) {
-      setStatus("error");
-      setFailure("The form isn't configured yet — email me directly below.");
-      return;
-    }
-
     setStatus("sending");
     setFailure("");
 
@@ -71,13 +61,9 @@ export default function ContactForm() {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
-          access_key: ACCESS_KEY,
-          subject: `Portfolio enquiry from ${values.name.trim()}`,
-          from_name: "Portfolio",
           name: values.name.trim(),
           email: values.email.trim(),
           message: values.message.trim(),
-          botcheck: false,
         }),
       });
 
