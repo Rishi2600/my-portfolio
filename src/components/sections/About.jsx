@@ -3,7 +3,6 @@ import Reveal from "../ui/Reveal";
 const FACTS = [
   ["Focus", "Full-stack web"],
   ["Stack", "TS · Go · Rust"],
-  ["Building", "IcePlease"],
 ];
 
 export default function About() {
@@ -32,7 +31,7 @@ export default function About() {
           fundamentals sharp.
         </p>
       </Reveal>
-      <Reveal delay={3} className="grid grid-cols-3 gap-5 mt-10 pt-8 fact-row">
+      <Reveal delay={3} className="grid grid-cols-2 gap-5 mt-10 pt-8 fact-row">
         {FACTS.map(([k, v]) => (
           <div key={k}>
             <div className="font-mono text-[11px] uppercase tracking-widest mb-1" style={{ color: "var(--clay)" }}>

@@ -13,7 +13,7 @@ export default function Projects() {
             Selected work
           </Reveal>
           <Reveal delay={1}>
-            <h2 className="font-display text-4xl md:text-5xl leading-tight">Four things I've shipped.</h2>
+            <h2 className="font-display text-4xl md:text-5xl leading-tight">My work.</h2>
           </Reveal>
         </div>
         <Reveal delay={2} className="max-w-sm text-sm" style={{ color: "var(--muted)" }}>
